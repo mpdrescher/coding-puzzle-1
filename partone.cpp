@@ -30,7 +30,7 @@ namespace
         bool isclose(char) const;
     };
 
-    struct parenthesis_state final : public state
+    struct parentheses_state final : public state
     {
         state_ptr next(char) const;
         bool isclose(char) const;
@@ -48,10 +48,10 @@ namespace
         bool isclose(char) const;
     };
 
-    // impls
+    // Implementations
     state_ptr initial_state::next(char c) const
     {
-        return c == open_paren ? state_ptr{new parenthesis_state} : state_ptr{};
+        return c == open_paren ? state_ptr{new parentheses_state} : state_ptr{};
     }
 
     bool initial_state::isclose(char) const
@@ -59,13 +59,13 @@ namespace
         return false;
     }
 
-    state_ptr parenthesis_state::next(char c) const
+    state_ptr parentheses_state::next(char c) const
     {
         return c == open_brace ? state_ptr{new curly_braces_state}
             : state_ptr{};
     }
 
-    bool parenthesis_state::isclose(char c) const
+    bool parentheses_state::isclose(char c) const
     {
         return c == close_paren;
     }
@@ -85,7 +85,7 @@ namespace
     {
         switch (c)
         {
-            case open_paren:   return state_ptr{new parenthesis_state};
+            case open_paren:   return state_ptr{new parentheses_state};
             case open_brace:   return state_ptr{new curly_braces_state};
             case open_bracket: return state_ptr{new square_brackets_state};
         }
@@ -134,10 +134,25 @@ namespace
 
 int main()
 {
-    std::string line;
-    while (std::getline(std::cin, line))
+    try
     {
-        std::cout << (wellformed(line) ? "True" : "False") << std::endl;
+        std::string line;
+        std::getline(std::cin, line);
+        const unsigned long no_of_testcases{std::stoul(line)};
+        for (unsigned long i = 0; i < no_of_testcases; ++i)
+        {
+            std::getline(std::cin, line);
+            const unsigned long no_of_strings{std::stoul(line)};
+            for (unsigned long j = 0; j < no_of_strings; ++j)
+            {
+                std::getline(std::cin, line);
+                std::cout << (wellformed(line) ? "True" : "False") << std::endl;
+            }
+        }
+    }
+    catch (std::invalid_argument&)
+    {
+        return 1;
     }
 
     return 0;

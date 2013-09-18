@@ -1,4 +1,5 @@
-CXX=clang++ -std=c++11 -stdlib=libc++ -Wall -Wextra -U__STRICT_ANSI__ -D__STDC_FORMAT_MACROS
+#CXX=clang++ -std=c++11 -stdlib=libc++ -Wall -Wextra -U__STRICT_ANSI__ -D__STDC_FORMAT_MACROS
+CXX=g++ -std=c++11 -Wall -Wextra -pedantic
 RM=rm -f
 
 SRCS=partone.cpp
