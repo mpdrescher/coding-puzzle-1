@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-"""Tests.
+"""Some tests.
 
 You need Python 2.7 or 3 in your PATH to execute this file.
 """

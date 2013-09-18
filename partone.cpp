@@ -1,11 +1,19 @@
+// Solution for part I
+// Benjamin Kircher, benjamin.kircher@gmail.com
+
 #include <iostream>
 #include <ostream>
 #include <string>
 #include <memory>
 #include <stack>
 #include <utility>
-#include <chrono>
-#include <sstream>
+
+// #define MEASURE_TIME
+
+#ifdef MEASURE_TIME
+# include <chrono>
+# include <sstream>
+#endif
 
 namespace
 {
@@ -133,6 +141,7 @@ namespace
         return true;
     }
 
+#ifdef MEASURE_TIME
     // Returns a string containing the elapsed time between 'start' and 'end' in
     // milliseconds.
     std::string
@@ -145,11 +154,14 @@ namespace
         sstr << std::chrono::duration_cast<milliseconds>(elapsed).count() << " [ms]";
         return sstr.str();
     }
+#endif
 }
 
 int main()
 {
+#ifdef MEASURE_TIME
     auto start = std::chrono::steady_clock::now();
+#endif
 
     try
     {
@@ -172,12 +184,11 @@ int main()
         return 1;
     }
 
+#ifdef MEASURE_TIME
     auto end = std::chrono::steady_clock::now();
     std::cout << "total execution time: " << format_time(start, end) << '\n';
+#endif
 
     return 0;
 }
-
-// Some implementation notes and ideas for further improvement:
-// - <iostream> is slow. We could use <stdio.h> functions instead
 

@@ -1,0 +1,30 @@
+Some remarks:
+
+This code compiles on my Linux box with gcc version 4.8.1 using libstdc++ and on
+my Mac OS X with clang 3.4 (trunk version) and libc++ (also directly from
+trunk). Hope it does on your side too.
+
+This solution makes use of run-time polymorphism with all hassles that comes
+with it: the necessity to do heap-allocations, manual memory management,
+overhead due to virtual function calls.
+
+This solution does a lot of heap allocations (approx. linear to the number of
+characters in a string, e.g., a line of 500 open parentheses and 500 close
+parentheses does a little more than 500 heap allocations, one for each state).
+This is way slower than stack allocation, could lead to fragmentation and
+out-of-memory issues in real-world applications. A possible solution would be to
+use a custom stack allocator (like that of Howard Hinnant,
+http://home.roadrunner.com/~hinnant/stack_alloc.html) but I couldn't find the
+time for this experiment.
+
+For your information, I needed about an hour of thinking until I came up with
+the stack approach. After that, I needed approximately an additional time of 3
+hours for implementing the remaining work.
+
+If you are interested, I included the Git repository in the tarball so that you
+are able to see what my steps were.
+
+Had fun doing this, thank you. Hope this meets your expectations and thanks
+again for taking the time to review my solution.
+
+Benjamin Kircher, benjamin.kircher@gmail.com

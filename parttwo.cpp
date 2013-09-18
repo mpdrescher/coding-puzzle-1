@@ -1,3 +1,6 @@
+// Solution for part II
+// Benjamin Kircher, benjamin.kircher@gmail.com
+
 #include <iostream>
 #include <ostream>
 #include <string>
@@ -13,6 +16,14 @@
 #include <vector>
 #include <exception>
 #include <stdexcept>
+#include <functional>
+
+// #define MEASURE_TIME
+
+#ifdef MEASURE_TIME
+# include <chrono>
+# include <sstream>
+#endif
 
 namespace
 {
@@ -273,11 +284,28 @@ namespace
 
         return true;
     }
+
+#ifdef MEASURE_TIME
+    // Returns a string containing the elapsed time between 'start' and 'end' in
+    // milliseconds.
+    std::string
+    format_time(const std::chrono::time_point<std::chrono::steady_clock>& start,
+        const std::chrono::time_point<std::chrono::steady_clock>& end)
+    {
+        typedef std::chrono::duration<float, std::milli> milliseconds;
+        std::ostringstream sstr;
+        const auto elapsed = end - start;
+        sstr << std::chrono::duration_cast<milliseconds>(elapsed).count() << " [ms]";
+        return sstr.str();
+    }
+#endif
 }
 
 int main()
 {
-//    typedef std::vector<std::string> testcase;
+#ifdef MEASURE_TIME
+    auto start = std::chrono::steady_clock::now();
+#endif
 
     thread_pool pool;
     std::vector<std::future<std::string>> results;
@@ -313,6 +341,11 @@ int main()
     {
         std::cout << result.get() << std::endl;
     }
+
+#ifdef MEASURE_TIME
+    auto end = std::chrono::steady_clock::now();
+    std::cout << "total execution time: " << format_time(start, end) << '\n';
+#endif
 
     return 0;
 }
