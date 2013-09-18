@@ -27,7 +27,7 @@ class bcolors:
 def runtests(executable, testcases):
     run = 1
     for testcase in testcases:
-        print('Running {} with testcase{}:'.format(executable, run))
+        print('Running {} with testcase {}:'.format(executable, run))
         run = run + 1
         proc = subprocess.Popen([executable], stdin=subprocess.PIPE,
             stdout=subprocess.PIPE)
@@ -52,9 +52,8 @@ def runtests(executable, testcases):
                 actual = results[i]
                 expected = testcase[k]
                 if actual != expected:
-                    print('\'{}\' --> {} ' + bcolors.FAIL + '[F]' +
-                            bcolors.NORMAL + ' expected: {}'.format(k, actual,
-                                expected))
+                    print('\'{}\' --> {} '.format(k, actual) + bcolors.FAIL +
+                            '[F]' + bcolors.NORMAL + ' expected: {}'.format(expected))
                 else:
                     print('\'{}\' --> {}'.format(k, actual))
                 i = i + 1
@@ -90,3 +89,15 @@ testcase3 = OrderedDict([
     ])
 
 runtests('./partone', [testcase1, testcase2, testcase3])
+
+
+testcase4 = OrderedDict([
+        ('1', None),
+        ('4', None),
+        ('()', '1:true'),
+        ('([)]', '2:false'),
+        ('{}', '3:false'),
+        ('()()', '4:true'),
+    ])
+
+runtests('./parttwo', [testcase4])

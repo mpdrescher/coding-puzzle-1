@@ -122,14 +122,16 @@ namespace
             cond_.notify_one();
         }
 
-        void wait_and_pop(value_type& val)
+        bool try_pop(value_type& val)
         {
-            std::unique_lock<std::mutex> guard{mutex_};
-            cond_.wait(guard, [this]{
-                return !data_.empty();
-            });
+            std::lock_guard<std::mutex> guard{mutex_};
+            if (data_.empty())
+            {
+                return false;
+            }
             val = data_.front();
             data_.pop();
+            return true;
         }
 
         locked_queue(const locked_queue&) = delete;
@@ -141,8 +143,8 @@ namespace
         std::condition_variable cond_;
     };
 
-    // A simple thread pool. Slightly adapted from C++ Concurrency in Action,
-    // chapter 9.
+    // A very simple thread pool. Slightly adapted from C++ Concurrency in
+    // Action, chapter 9.
     class thread_pool
     {
     public:
@@ -150,17 +152,24 @@ namespace
             : done_{false}, tasks_{}, workers_{}, joiner_{workers_}
         {
             const unsigned int hwthreads{std::thread::hardware_concurrency()};
+
             try
             {
                 for (unsigned int i = 0; i < hwthreads; ++i)
                 {
-                    workers_.emplace_back([this]{
+                    workers_.emplace_back([this]
+                    {
                         while (!done_)
                         {
-                            // Better use try_pop and std::this_thread::yield
                             std::function<void()> task;
-                            tasks_.wait_and_pop(task);
-                            task();
+                            if (tasks_.try_pop(task))
+                            {
+                                task();
+                            }
+                            else
+                            {
+                                std::this_thread::yield(); // Wait a little bit
+                            }
                         }
                     });
                 }
@@ -183,7 +192,7 @@ namespace
         {
             typedef typename std::result_of<Function(Args...)>::type result_type;
 
-            if (!done_)
+            if (done_)
             {
                 throw std::runtime_error("submit on stopped thread_pool");
             }
@@ -287,7 +296,8 @@ int main()
                 results.push_back(
                         pool.submit([index, line]() -> std::string
                         {
-                            return wellformed(line) ? "True" : "False";
+                            return std::to_string(index + 1)
+                                + (wellformed(line) ? ":true" : ":false");
                         })
                     );
             }
