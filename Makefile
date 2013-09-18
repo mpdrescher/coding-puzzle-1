@@ -1,19 +1,22 @@
 #CXX=clang++ -std=c++11 -stdlib=libc++ -Wall -Wextra -U__STRICT_ANSI__ -D__STDC_FORMAT_MACROS
 CXX=g++ -std=c++11 -Wall -Wextra -pedantic
+LDFLAGS=-pthread
 RM=rm -f
 
-SRCS=partone.cpp
-OBJS=$(subst .cpp,.o,$(SRCS))
+all: partone parttwo
 
-all: partone
+partone: partone.o
+	$(CXX) -o partone partone.o
 
-partone: $(OBJS)
-	$(CXX) -o partone $(OBJS)
+parttwo: parttwo.o
+	$(CXX) $(LDFLAGS) -o parttwo parttwo.o
 
 partone.o: partone.cpp
 
+parttwo.o: parttwo.cpp
+
 clean:
-	$(RM) $(OBJS)
+	$(RM) partone.o parttwo.o
 
 dist-clean:
-	$(RM) partone
+	$(RM) partone parttwo
