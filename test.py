@@ -8,17 +8,8 @@ You need Python 2.7 or 3 in your PATH to execute this file.
 from __future__ import print_function
 import subprocess
 from collections import OrderedDict
-
-# valgrind="valgrind --tool=memcheck --track-origins=yes --leak-check=full"
-#
-# echo "\
-# ()
-# ([)]
-# {}
-# ()()" | $valgrind ./partone
-#
-# # 500 parentheses, 1000 chars --> approx. 500 heap allocations
-# echo "\
+import os.path
+import sys
 
 class bcolors:
     FAIL = '\033[91m'
@@ -88,16 +79,22 @@ testcase3 = OrderedDict([
         #('([])', 'False'),
     ])
 
-runtests('./partone', [testcase1, testcase2, testcase3])
-
-
 testcase4 = OrderedDict([
         ('1', None),
-        ('4', None),
+        ('8', None),
         ('()', '1:true'),
         ('([)]', '2:false'),
         ('{}', '3:false'),
         ('()()', '4:true'),
+        ('({[[[[[[[[[[[[[[[[[[[[]]]]]]]]]]]]]]]]]]]]})', '5:true'),
+        ('({[()][{}][[]]})', '6:true'),
+        ('[]', '7:false'),
+        ('([])', '8:false'),
     ])
 
+if not os.path.exists('partone') or not os.path.exists('parttwo'):
+    print('Please invoke make first')
+    sys.exit()
+
+runtests('./partone', [testcase1, testcase2, testcase3])
 runtests('./parttwo', [testcase4])

@@ -4,6 +4,8 @@
 #include <memory>
 #include <stack>
 #include <utility>
+#include <chrono>
+#include <sstream>
 
 namespace
 {
@@ -130,10 +132,25 @@ namespace
 
         return true;
     }
+
+    // Returns a string containing the elapsed time between 'start' and 'end' in
+    // milliseconds.
+    std::string
+    format_time(const std::chrono::time_point<std::chrono::steady_clock>& start,
+        const std::chrono::time_point<std::chrono::steady_clock>& end)
+    {
+        typedef std::chrono::duration<float, std::milli> milliseconds;
+        std::ostringstream sstr;
+        const auto elapsed = end - start;
+        sstr << std::chrono::duration_cast<milliseconds>(elapsed).count() << " [ms]";
+        return sstr.str();
+    }
 }
 
 int main()
 {
+    auto start = std::chrono::steady_clock::now();
+
     try
     {
         std::string line;
@@ -154,6 +171,9 @@ int main()
     {
         return 1;
     }
+
+    auto end = std::chrono::steady_clock::now();
+    std::cout << "total execution time: " << format_time(start, end) << '\n';
 
     return 0;
 }

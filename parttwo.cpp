@@ -152,6 +152,7 @@ namespace
             : done_{false}, tasks_{}, workers_{}, joiner_{workers_}
         {
             const unsigned int hwthreads{std::thread::hardware_concurrency()};
+//      std::cout << "hwthreads: " << hwthreads << std::endl;
 
             try
             {
