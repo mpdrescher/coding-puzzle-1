@@ -74,10 +74,7 @@ namespace
         return c == open_paren ? state_ptr{new parentheses_state} : state_ptr{};
     }
 
-    bool initial_state::isclose(char) const
-    {
-        return false;
-    }
+    bool initial_state::isclose(char) const { return false; }
 
     state_ptr parentheses_state::next(char c) const
     {
@@ -85,10 +82,7 @@ namespace
             : state_ptr{};
     }
 
-    bool parentheses_state::isclose(char c) const
-    {
-        return c == close_paren;
-    }
+    bool parentheses_state::isclose(char c) const { return c == close_paren; }
 
     state_ptr curly_braces_state::next(char c) const
     {
@@ -119,7 +113,7 @@ namespace
 
     // A thread-safe queue using locks and condition variables (from C++
     // Concurrency in Action, chapter 6.2)
-    template<typename T> class locked_queue
+    template <typename T> class locked_queue
     {
     public:
         typedef T value_type;
@@ -159,31 +153,32 @@ namespace
     class thread_pool
     {
     public:
-        thread_pool()
-            : done_{false}, tasks_{}, workers_{}, joiner_{workers_}
+        thread_pool() : done_{false}, tasks_{}, workers_{}, joiner_{workers_}
         {
             const unsigned int hwthreads{std::thread::hardware_concurrency()};
-//      std::cout << "hwthreads: " << hwthreads << std::endl;
+            //      std::cout << "hwthreads: " << hwthreads << std::endl;
 
             try
             {
                 for (unsigned int i = 0; i < hwthreads; ++i)
                 {
-                    workers_.emplace_back([this]
-                    {
-                        while (!done_)
+                    workers_.emplace_back(
+                        [this]
                         {
-                            std::function<void()> task;
-                            if (tasks_.try_pop(task))
+                            while (!done_)
                             {
-                                task();
+                                std::function<void()> task;
+                                if (tasks_.try_pop(task))
+                                {
+                                    task();
+                                }
+                                else
+                                {
+                                    std::this_thread::yield(); // Wait a little
+                                                               // bit
+                                }
                             }
-                            else
-                            {
-                                std::this_thread::yield(); // Wait a little bit
-                            }
-                        }
-                    });
+                        });
                 }
             }
             catch (std::exception&)
@@ -193,16 +188,14 @@ namespace
             }
         }
 
-        ~thread_pool()
-        {
-            done_ = true;
-        }
+        ~thread_pool() { done_ = true; }
 
-        template<typename Function, typename... Args>
+        template <typename Function, typename... Args>
         auto submit(Function&& function, Args&&... args) // URef
-        -> std::future<typename std::result_of<Function(Args...)>::type>
+            -> std::future<typename std::result_of<Function(Args...)>::type>
         {
-            typedef typename std::result_of<Function(Args...)>::type result_type;
+            typedef typename std::result_of<Function(Args...)>::type
+            result_type;
 
             if (done_)
             {
@@ -210,14 +203,12 @@ namespace
             }
 
             auto taskptr = std::make_shared<std::packaged_task<result_type()>>(
-                std::bind(std::forward<Function>(function), std::forward<Args>(args)...)
-            );
+                std::bind(std::forward<Function>(function),
+                          std::forward<Args>(args)...));
 
             std::future<result_type> result = taskptr->get_future();
             tasks_.push([taskptr]()
-            {
-                (*taskptr)();
-            });
+                        { (*taskptr)(); });
             return result;
         }
 
@@ -228,7 +219,8 @@ namespace
         public:
             explicit join_threads(std::vector<std::thread>& threads)
                 : threads_(threads)
-            {}
+            {
+            }
 
             ~join_threads()
             {
@@ -290,12 +282,13 @@ namespace
     // milliseconds.
     std::string
     format_time(const std::chrono::time_point<std::chrono::steady_clock>& start,
-        const std::chrono::time_point<std::chrono::steady_clock>& end)
+                const std::chrono::time_point<std::chrono::steady_clock>& end)
     {
         typedef std::chrono::duration<float, std::milli> milliseconds;
         std::ostringstream sstr;
         const auto elapsed = end - start;
-        sstr << std::chrono::duration_cast<milliseconds>(elapsed).count() << " [ms]";
+        sstr << std::chrono::duration_cast<milliseconds>(elapsed).count()
+             << " [ms]";
         return sstr.str();
     }
 #endif
@@ -322,20 +315,15 @@ int main()
             for (unsigned long index = 0; index < no_of_strings; ++index)
             {
                 std::getline(std::cin, line);
-                results.push_back(
-                        pool.submit([index, line]() -> std::string
-                        {
-                            return std::to_string(index + 1)
-                                + (wellformed(line) ? ":true" : ":false");
-                        })
-                    );
+                results.push_back(pool.submit([ index, line ]()->std::string
+                                              {
+                    return std::to_string(index + 1) +
+                           (wellformed(line) ? ":true" : ":false");
+                }));
             }
         }
     }
-    catch (std::invalid_argument&)
-    {
-        return 1;
-    }
+    catch (std::invalid_argument&) { return 1; }
 
     for (auto& result : results)
     {
@@ -349,4 +337,3 @@ int main()
 
     return 0;
 }
-

@@ -64,10 +64,7 @@ namespace
         return c == open_paren ? state_ptr{new parentheses_state} : state_ptr{};
     }
 
-    bool initial_state::isclose(char) const
-    {
-        return false;
-    }
+    bool initial_state::isclose(char) const { return false; }
 
     state_ptr parentheses_state::next(char c) const
     {
@@ -75,10 +72,7 @@ namespace
             : state_ptr{};
     }
 
-    bool parentheses_state::isclose(char c) const
-    {
-        return c == close_paren;
-    }
+    bool parentheses_state::isclose(char c) const { return c == close_paren; }
 
     state_ptr curly_braces_state::next(char c) const
     {
@@ -146,12 +140,13 @@ namespace
     // milliseconds.
     std::string
     format_time(const std::chrono::time_point<std::chrono::steady_clock>& start,
-        const std::chrono::time_point<std::chrono::steady_clock>& end)
+                const std::chrono::time_point<std::chrono::steady_clock>& end)
     {
         typedef std::chrono::duration<float, std::milli> milliseconds;
         std::ostringstream sstr;
         const auto elapsed = end - start;
-        sstr << std::chrono::duration_cast<milliseconds>(elapsed).count() << " [ms]";
+        sstr << std::chrono::duration_cast<milliseconds>(elapsed).count()
+             << " [ms]";
         return sstr.str();
     }
 #endif
@@ -179,10 +174,7 @@ int main()
             }
         }
     }
-    catch (std::invalid_argument&)
-    {
-        return 1;
-    }
+    catch (std::invalid_argument&) { return 1; }
 
 #ifdef MEASURE_TIME
     auto end = std::chrono::steady_clock::now();
@@ -191,4 +183,3 @@ int main()
 
     return 0;
 }
-
