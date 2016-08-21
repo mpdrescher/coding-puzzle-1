@@ -1,3 +1,9 @@
+My attempt at the following coding puzzle in the Rust language.
+(The cargo project is inside the rust folder)
+
+===ORIGINAL TEXT:
+
+
 This is a coding puzzle I solved during the hiring process of a company. This
 repository contains my take on this. I found it so interesting that I like to
 share it and my solution.
